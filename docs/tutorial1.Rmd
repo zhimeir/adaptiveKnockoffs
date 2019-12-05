@@ -1,0 +1,153 @@
+---
+title: "An introduction to adaptive knockoffs"
+author: "Zhimei Ren"
+date: "4/27/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This notebook introduces how to use the `adaptiveKnockoff` R package. In this preliminary tutorial, we will focus on introducing how to use the adaptive knockoff wrapper with the default settings. We will generate synthetic data and construct knockoff and feature importance statistics via the `knockoff` package. Then we show how to call the adaptive knockoff function and obtain results.
+
+The adaptiveKnockoff package can installed via:
+```{r,eval = FALSE}
+library("devtools")
+#install_github("zhimeir/adaptiveKnockoffs")
+library("adaptiveKnockoffs")
+```
+We need the following packages for later implementation:
+```{r, results="markup",message = FALSE,warning=FALSE}
+library("knockoff")
+library("gam")
+library("randomForest")
+library("ggplot2")
+library("cowplot")
+library("adaptiveKnockoff")
+```
+The covariate matrix $X$ is generated from a multivariate Gaussian distribution and the response $y$ is generated from a linear model conditional on $X$. 
+```{r}
+# Parameters
+set.seed(2019)
+n = 1000 # number of observations
+p = 900 # number of features
+k = 150 # number of signals
+amp = 3.5 # signal amplitude
+
+#Generate covariate matrix from a multivariate Gaussian distribution 
+mu = rep(0,p)
+rho = 0.5 
+Sigma = toeplitz(rho^(0:(p-1)))
+X = matrix(rnorm(n*p),n) %*% chol(Sigma)
+
+#Generate the response y from a linear model.
+nonzero = 1:k
+beta0 = amp * (1:p %in% nonzero)*sign(rnorm(p)) / sqrt(n)
+y.sample = function(X) X%*%beta0+rnorm(n,0,1)
+y = y.sample(X)
+```
+
+The features live on a real line and are indexed from 1 to p according to their location. Specially, the nonzero ones are all clusted at end, shown as the below figure:
+```{r,echo=FALSE,fig1, fig.height = 1.5, fig.width = 10, fig.align = "center"}
+Hypotheses = rep("null",p)
+Hypotheses[nonzero] = "non-null"
+df = data.frame(Location = 1:p, y = 0)
+pp = ggplot(df,aes(x = Location,y= y,col = Hypotheses))+
+  geom_point(shape =15)+
+  theme( panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(),
+         panel.border = element_blank()
+        )+
+  theme_bw()+
+  scale_color_manual(values=c("royalblue","grey85"))+
+  ylim(c(-0,0))
+print(pp)  
+```
+
+Consider a series of target FDR levels $\{0.01,\ldots,0.3\}$:
+```{r}
+alphalist = seq(0.3,0.01,-0.01)
+```
+Set the side information $U_j$ to be the index of feature $j$:
+```{r}
+U=1:p
+```
+We use the `knockoff` package to generate knockoff copy $\tilde{X}$ and calculate the feature importance statistics $W$:
+```{r,message = FALSE}
+Xk = create.gaussian(X,mu,Sigma)#generate knockoff Xk
+W = stat.glmnet_coefdiff(X,Xk,y)#calculate feature importance statistics (LCD)
+```
+Call adaptive knockoff function:
+```{r,message = FALSE,warning = FALSE}
+res = adaptiveKnockoff::adaptive_knockoff(W,U,fdr = alphalist)
+```
+Calculate the resulting power and FDP:
+```{r}
+fdp = c()
+power = c()
+for (i in 1:length(alphalist )){
+  if(res$nrejs[[i]]>0){
+    rej  = res$rejs[[i]]
+    fdp = c(fdp,sum(beta0[rej]==0)/max(length(rej),1))
+    power = c(power,sum(beta0[rej]!=0)/max(k,1))
+
+  }else{
+    fdp = c(fdp,0)
+    power = c(power,0)
+  }
+}
+```
+The resulting power for different FDR target levels (in a decreasing order):
+```{r,echo = FALSE}
+power
+```
+The resulting FDP for different FDR target levels (in a decreasing order):
+```{r,echo = FALSE}
+fdp
+```
+Plot power and FDP versus the target FDR level:
+```{r,fig2,fig.height = 3, fig.width = 8, fig.align = "center",warning = FALSE}
+df = data.frame(x = seq(0.3,0.01,-0.01),y = power)
+df$title = "Power"
+pp1 = ggplot(df,aes(x =x , y = y,color = "red")) +
+  geom_line(linetype = "dashed",size = 0.5) +
+  geom_point(size = 1.5)+
+  scale_shape_manual(values=seq(15,24))+
+  xlab("target FDR")+
+  ylab("Power")+
+  facet_grid(.~title)+
+  theme(legend.position="none")+
+  theme(panel.border = element_rect(size = 3, linetype='solid')
+        )+
+  theme_bw()
+
+df = data.frame(x = seq(0.3,0.01,-0.01),y = fdp)
+df$title = "FDP"
+pp2 = ggplot(df,aes(x =x , y = y,color = "red")) +
+  geom_line(linetype = "dashed",size = 0.5) +
+  geom_point(size = 1.5)+
+  scale_shape_manual(values=seq(15,24))+
+  xlab("target FDR")+
+  ylab("FDP")+
+  facet_grid(.~title)+
+  theme(legend.position="none")+
+  theme(panel.border = element_rect(size = 3, linetype='solid')
+        )+
+  theme_bw()+
+  geom_line(aes(x =seq(0.01,0.3,0.01), y = seq(0.01,0.3,0.01)), color = "black",linetype = "dotted")
+  
+prow <- plot_grid( pp1+ theme(legend.position="none"),
+                   pp2 + theme(legend.position="none"),
+                   #align = 'h',
+                   #hjust = -1,
+                   nrow = 1
+)
+plot_grid( prow, legend, rel_widths = c(2.5, 0.3),rel_heights = c(1,0.8))
+```
+
+We can also plot the realized ordering determined by adaptive knockoff. The plot below contains the last two hundred features in the ordering.
+```{r,fig3,fig.height=3,fig.width=7,fig.align="center"}
+pp = adaptiveKnockoff::plot_ordering(res,nonzero,start_index = 701)
+print(pp)
+```
