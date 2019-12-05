@@ -365,8 +365,8 @@ div.tocify {
 
 
 <p>This notebook introduces how to use the <code>adaptiveKnockoff</code> R package. In this preliminary tutorial, we will focus on introducing how to use the adaptive knockoff wrapper with the default settings. We will generate synthetic data and construct knockoffs and feature importance statistics via the <code>knockoff</code> package. Then we show how to call the adaptive knockoff function and obtain results.</p>
-<div id="load-necessary-libraries" class="section level2">
-<h2>Load necessary libraries</h2>
+<div id="load-necessary-libraries" class="section level3">
+<h3>Load necessary libraries</h3>
 <p>We need the following packages for later implementation:</p>
 <pre class="r"><code>library(&quot;knockoff&quot;)
 library(&quot;gam&quot;)
@@ -375,8 +375,8 @@ library(&quot;ggplot2&quot;)
 library(&quot;cowplot&quot;)
 library(&quot;adaptiveKnockoff&quot;)</code></pre>
 </div>
-<div id="generate-data" class="section level2">
-<h2>Generate data</h2>
+<div id="generate-data" class="section level3">
+<h3>Generate data</h3>
 <p>The covariate matrix <span class="math inline">\(X\)</span> is generated from a multivariate Gaussian distribution and the response <span class="math inline">\(y\)</span> is generated from a linear model conditional on <span class="math inline">\(X\)</span>.</p>
 <pre class="r"><code># Parameters
 set.seed(2019)
@@ -398,18 +398,24 @@ y.sample = function(X) X%*%beta0+rnorm(n,0,1)
 y = y.sample(X)</code></pre>
 <p>The features live on a real line and are indexed from 1 to p according to their location. Specially, the nonzero ones are all clusted at end, shown as the below figure: <img src="tutorial1_files/figure-html/fig1-1.png" width="960" style="display: block; margin: auto;" /></p>
 <p>Consider a series of target FDR levels <span class="math inline">\(\{0.01,\ldots,0.3\}\)</span>:</p>
-<pre class="r"><code>alphalist = seq(0.3,0.01,-0.01)</code></pre>
+<pre class="r"><code>alphalist = seq(0.3,0.03,-0.03)</code></pre>
 <p>Set the side information <span class="math inline">\(U_j\)</span> to be the index of feature <span class="math inline">\(j\)</span>:</p>
 <pre class="r"><code>U=1:p</code></pre>
+</div>
+<div id="generate-knockoffs" class="section level3">
+<h3>Generate knockoffs</h3>
 <p>We use the <code>knockoff</code> package to generate knockoff copy <span class="math inline">\(\tilde{X}\)</span> and calculate the feature importance statistics <span class="math inline">\(W\)</span>:</p>
 <pre class="r"><code>Xk = create.gaussian(X,mu,Sigma)#generate knockoff Xk
 W = stat.glmnet_coefdiff(X,Xk,y)#calculate feature importance statistics (LCD)</code></pre>
+</div>
+<div id="adaptive-knockoffs" class="section level3">
+<h3>Adaptive knockoffs</h3>
 <p>Call adaptive knockoff function:</p>
 <pre class="r"><code>res = adaptiveKnockoff::adaptive_knockoff(W,U,fdr = alphalist)</code></pre>
 <p>Calculate the resulting power and FDP:</p>
 <pre class="r"><code>fdp = c()
 power = c()
-for (i in 1:length(alphalist )){
+for (i in 1:length(alphalist)){
   if(res$nrejs[[i]]&gt;0){
     rej  = res$rejs[[i]]
     fdp = c(fdp,sum(beta0[rej]==0)/max(length(rej),1))
@@ -421,55 +427,15 @@ for (i in 1:length(alphalist )){
   }
 }</code></pre>
 <p>The resulting power for different FDR target levels (in a decreasing order):</p>
-<pre><code>##  [1] 0.5066667 0.5066667 0.5066667 0.5066667 0.5066667 0.5066667 0.5066667
-##  [8] 0.5066667 0.5066667 0.5066667 0.5066667 0.5000000 0.4466667 0.4466667
-## [15] 0.4466667 0.4333333 0.4266667 0.4200000 0.4200000 0.3800000 0.3400000
-## [22] 0.3266667 0.3066667 0.3000000 0.2666667 0.0000000 0.0000000 0.0000000
-## [29] 0.0000000 0.0000000</code></pre>
+<pre><code>##  [1] 0.5066667 0.5066667 0.5066667 0.5066667 0.4466667 0.4466667 0.4200000
+##  [8] 0.3266667 0.2666667 0.0000000</code></pre>
 <p>The resulting FDP for different FDR target levels (in a decreasing order):</p>
-<pre><code>##  [1] 0.06172840 0.06172840 0.06172840 0.05000000 0.05000000 0.02564103
-##  [7] 0.01298701 0.01298701 0.01298701 0.00000000 0.00000000 0.00000000
-## [13] 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000
-## [19] 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000
-## [25] 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000</code></pre>
-<p>Plot power and FDP versus the target FDR level:</p>
-<pre class="r"><code>df = data.frame(x = seq(0.3,0.01,-0.01),y = power)
-df$title = &quot;Power&quot;
-pp1 = ggplot(df,aes(x =x , y = y,color = &quot;red&quot;)) +
-  geom_line(linetype = &quot;dashed&quot;,size = 0.5) +
-  geom_point(size = 1.5)+
-  scale_shape_manual(values=seq(15,24))+
-  xlab(&quot;target FDR&quot;)+
-  ylab(&quot;Power&quot;)+
-  facet_grid(.~title)+
-  theme(legend.position=&quot;none&quot;)+
-  theme(panel.border = element_rect(size = 3, linetype=&#39;solid&#39;)
-        )+
-  theme_bw()
-
-df = data.frame(x = seq(0.3,0.01,-0.01),y = fdp)
-df$title = &quot;FDP&quot;
-pp2 = ggplot(df,aes(x =x , y = y,color = &quot;red&quot;)) +
-  geom_line(linetype = &quot;dashed&quot;,size = 0.5) +
-  geom_point(size = 1.5)+
-  scale_shape_manual(values=seq(15,24))+
-  xlab(&quot;target FDR&quot;)+
-  ylab(&quot;FDP&quot;)+
-  facet_grid(.~title)+
-  theme(legend.position=&quot;none&quot;)+
-  theme(panel.border = element_rect(size = 3, linetype=&#39;solid&#39;)
-        )+
-  theme_bw()+
-  geom_line(aes(x =seq(0.01,0.3,0.01), y = seq(0.01,0.3,0.01)), color = &quot;black&quot;,linetype = &quot;dotted&quot;)
-  
-prow &lt;- plot_grid( pp1+ theme(legend.position=&quot;none&quot;),
-                   pp2 + theme(legend.position=&quot;none&quot;),
-                   #align = &#39;h&#39;,
-                   #hjust = -1,
-                   nrow = 1
-)
-plot_grid( prow, legend, rel_widths = c(2.5, 0.3),rel_heights = c(1,0.8))</code></pre>
-<p><img src="tutorial1_files/figure-html/fig2-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre><code>##  [1] 0.06172840 0.05000000 0.01298701 0.01298701 0.00000000 0.00000000
+##  [7] 0.00000000 0.00000000 0.00000000 0.00000000</code></pre>
+</div>
+<div id="visualizing-results" class="section level3">
+<h3>Visualizing results</h3>
+<p>Plot power and FDP versus the target FDR level: <img src="tutorial1_files/figure-html/fig2-1.png" width="768" style="display: block; margin: auto;" /></p>
 <p>We can also plot the realized ordering determined by adaptive knockoff. The plot below contains the last two hundred features in the ordering.</p>
 <pre class="r"><code>pp = adaptiveKnockoff::plot_ordering(res,nonzero,start_index = 701)
 print(pp)</code></pre>

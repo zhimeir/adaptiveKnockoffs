@@ -114,8 +114,8 @@ fdp
 ### Visualizing results
 
 Plot power and FDP versus the target FDR level:
-```{r,fig2,fig.height = 3, fig.width = 8, fig.align = "center",warning = FALSE}
-df = data.frame(x = seq(0.3,0.01,-0.01),y = power)
+```{r,fig2,fig.height = 3, fig.width = 8, fig.align = "center",warning = FALSE,echo=FALSE}
+df = data.frame(x = alphalist,y = power)
 df$title = "Power"
 pp1 = ggplot(df,aes(x =x , y = y,color = "red")) +
   geom_line(linetype = "dashed",size = 0.5) +
@@ -129,7 +129,7 @@ pp1 = ggplot(df,aes(x =x , y = y,color = "red")) +
         )+
   theme_bw()
 
-df = data.frame(x = seq(0.3,0.01,-0.01),y = fdp)
+df = data.frame(x = alphalist,y = fdp)
 df$title = "FDP"
 pp2 = ggplot(df,aes(x =x , y = y,color = "red")) +
   geom_line(linetype = "dashed",size = 0.5) +
@@ -142,12 +142,10 @@ pp2 = ggplot(df,aes(x =x , y = y,color = "red")) +
   theme(panel.border = element_rect(size = 3, linetype='solid')
         )+
   theme_bw()+
-  geom_line(aes(x =seq(0.01,0.3,0.01), y = seq(0.01,0.3,0.01)), color = "black",linetype = "dotted")
+  geom_line(aes(x =alphalist, y = alphalist), color = "black",linetype = "dotted")
   
 prow <- plot_grid( pp1+ theme(legend.position="none"),
                    pp2 + theme(legend.position="none"),
-                   #align = 'h',
-                   #hjust = -1,
                    nrow = 1
 )
 plot_grid( prow, legend, rel_widths = c(2.5, 0.3),rel_heights = c(1,0.8))

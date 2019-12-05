@@ -1,0 +1,4 @@
+"0","df = data.frame(x = alphalist,y = power)"
+"2","Error in as.data.frame.default(x[[i]], optional = TRUE) : 
+  cannot coerce class ‘""function""’ to a data.frame
+"
