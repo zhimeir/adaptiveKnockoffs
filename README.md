@@ -1,6 +1,5 @@
 # adaptiveKnockoffs
-An R package to implement the adaptive knockoffs procedure.
+An R package to implement the adaptive knockoffs procedure. Website: https://zhimeir.github.io/adaptiveKnockoffs/
 
-Accompany paper:
 ## Overview
 
