@@ -1,3 +1,4 @@
 # jemdoc: menu{MENU}{underscore.html}, nofooter
 == Adaptive Knockoffs
 
+A procedure for multiple testing with side information.
