@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1575587764188.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3513070188",
+    "id" : "D94C6CF2",
+    "lastKnownWriteTime" : 1575588945,
+    "last_content_update" : 1575588945360,
+    "path" : "~/Documents/GitHub/adaptiveKnockoffs/docs/index.Rmd",
+    "project_path" : "index.Rmd",
+    "properties" : {
+        "cursorPosition" : "24,175",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

@@ -21,6 +21,9 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -249,6 +252,63 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -256,6 +316,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -294,11 +364,9 @@ $(document).ready(function () {
 </div>
 
 
-<p>This notebook introduces how to use the <code>adaptiveKnockoff</code> R package. In this preliminary tutorial, we will focus on introducing how to use the adaptive knockoff wrapper with the default settings. We will generate synthetic data and construct knockoff and feature importance statistics via the <code>knockoff</code> package. Then we show how to call the adaptive knockoff function and obtain results.</p>
-<p>The adaptiveKnockoff package can installed via:</p>
-<pre class="r"><code>library(&quot;devtools&quot;)
-#install_github(&quot;zhimeir/adaptiveKnockoffs&quot;)
-library(&quot;adaptiveKnockoffs&quot;)</code></pre>
+<p>This notebook introduces how to use the <code>adaptiveKnockoff</code> R package. In this preliminary tutorial, we will focus on introducing how to use the adaptive knockoff wrapper with the default settings. We will generate synthetic data and construct knockoffs and feature importance statistics via the <code>knockoff</code> package. Then we show how to call the adaptive knockoff function and obtain results.</p>
+<div id="load-necessary-libraries" class="section level2">
+<h2>Load necessary libraries</h2>
 <p>We need the following packages for later implementation:</p>
 <pre class="r"><code>library(&quot;knockoff&quot;)
 library(&quot;gam&quot;)
@@ -306,6 +374,9 @@ library(&quot;randomForest&quot;)
 library(&quot;ggplot2&quot;)
 library(&quot;cowplot&quot;)
 library(&quot;adaptiveKnockoff&quot;)</code></pre>
+</div>
+<div id="generate-data" class="section level2">
+<h2>Generate data</h2>
 <p>The covariate matrix <span class="math inline">\(X\)</span> is generated from a multivariate Gaussian distribution and the response <span class="math inline">\(y\)</span> is generated from a linear model conditional on <span class="math inline">\(X\)</span>.</p>
 <pre class="r"><code># Parameters
 set.seed(2019)
@@ -403,9 +474,12 @@ plot_grid( prow, legend, rel_widths = c(2.5, 0.3),rel_heights = c(1,0.8))</code>
 <pre class="r"><code>pp = adaptiveKnockoff::plot_ordering(res,nonzero,start_index = 701)
 print(pp)</code></pre>
 <p><img src="tutorial1_files/figure-html/fig3-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -438,6 +512,32 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

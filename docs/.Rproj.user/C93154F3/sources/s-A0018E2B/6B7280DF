@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1575588975167.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2748444648",
+    "id" : "6B7280DF",
+    "lastKnownWriteTime" : 1575589537,
+    "last_content_update" : 1575589537040,
+    "path" : "~/Documents/GitHub/adaptiveKnockoffs/docs/tutorial1.Rmd",
+    "project_path" : "tutorial1.Rmd",
+    "properties" : {
+        "cursorPosition" : "154,0",
+        "last_setup_crc32" : "A0018E2Bbb338d19",
+        "scrollLine" : "124"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
