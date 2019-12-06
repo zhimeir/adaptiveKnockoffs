@@ -5,14 +5,14 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "499251018",
+    "hash" : "0",
     "id" : "D94C6CF2",
-    "lastKnownWriteTime" : 1575590894,
-    "last_content_update" : 1575590894843,
+    "lastKnownWriteTime" : 1575607754,
+    "last_content_update" : 1575607754456,
     "path" : "~/Documents/GitHub/adaptiveKnockoffs/docs/index.Rmd",
     "project_path" : "index.Rmd",
     "properties" : {
-        "cursorPosition" : "17,59",
+        "cursorPosition" : "24,508",
         "scrollLine" : "0"
     },
     "relative_order" : 1,
