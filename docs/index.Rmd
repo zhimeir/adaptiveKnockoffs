@@ -10,7 +10,7 @@ output:
 
 ### Overview
 
-Adaptive Knockoffs is a procedure for the probelm multiple testing with side information. To learn more about the methodology, readers can read the our paper [Adaptive Knockoffs](). We have a R package, adaptiveKnockoffs, to implement the procedure. This page introduces provides tutorials for using the R package.
+Adaptive Knockoffs is a procedure for the probelm of multiple testing with side information. To learn more about the methodology, readers can read the our paper [Adaptive Knockoffs](). The R package, adaptiveKnockoffs, implements this procedure. This website provides tutorials for using the adaptiveKnockoffs R package.
 
 ----
 
