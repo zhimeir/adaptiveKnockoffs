@@ -4,6 +4,8 @@ navbar:
   left:
     - text: "Tutorial 1"
       href: tutorial1.html
+    - text: "Code"
+      href: https://github.com/zhimeir/adaptiveKnockoffs/
 output_dir: "."
 output:
   html_document:
