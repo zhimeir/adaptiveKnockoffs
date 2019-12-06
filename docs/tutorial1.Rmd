@@ -1,7 +1,7 @@
 ---
 title: "An introduction to adaptive knockoffs"
 author: "Zhimei Ren"
-date: "4/27/2019"
+date: 
 output: html_document
 ---
 
@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 This notebook introduces how to use the `adaptiveKnockoff` R package. In this preliminary tutorial, we will focus on introducing how to use the adaptive knockoff wrapper with the default settings. We will generate synthetic data and construct knockoffs and feature importance statistics via the `knockoff` package. Then we show how to call the adaptive knockoff function and obtain results.
 
 
-### Load necessary libraries
+### Load libraries
 We need the following packages for later implementation:
 ```{r, results="markup",message = FALSE,warning=FALSE}
 library("knockoff")
@@ -80,7 +80,7 @@ Xk = create.gaussian(X,mu,Sigma)#generate knockoff Xk
 W = stat.glmnet_coefdiff(X,Xk,y)#calculate feature importance statistics (LCD)
 ```
 
-### Adaptive knockoffs
+### Run adaptive knockoffs
 
 Call adaptive knockoff function:
 ```{r,message = FALSE,warning = FALSE}
@@ -153,6 +153,5 @@ plot_grid( prow, legend, rel_widths = c(2.5, 0.3),rel_heights = c(1,0.8))
 
 We can also plot the realized ordering determined by adaptive knockoff. The plot below contains the last two hundred features in the ordering.
 ```{r,fig3,fig.height=3,fig.width=7,fig.align="center"}
-pp = adaptiveKnockoff::plot_ordering(res,nonzero,start_index = 701)
-print(pp)
+adaptiveKnockoff::plot_ordering(res,nonzero,start_index = 701)
 ```

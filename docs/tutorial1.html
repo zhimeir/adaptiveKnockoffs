@@ -343,7 +343,7 @@ div.tocify {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="tutorial1.html">First tutorial</a>
+  <a href="tutorial1.html">Tutorial 1</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -359,14 +359,13 @@ div.tocify {
 
 <h1 class="title toc-ignore">An introduction to adaptive knockoffs</h1>
 <h4 class="author">Zhimei Ren</h4>
-<h4 class="date">4/27/2019</h4>
 
 </div>
 
 
 <p>This notebook introduces how to use the <code>adaptiveKnockoff</code> R package. In this preliminary tutorial, we will focus on introducing how to use the adaptive knockoff wrapper with the default settings. We will generate synthetic data and construct knockoffs and feature importance statistics via the <code>knockoff</code> package. Then we show how to call the adaptive knockoff function and obtain results.</p>
-<div id="load-necessary-libraries" class="section level3">
-<h3>Load necessary libraries</h3>
+<div id="load-libraries" class="section level3">
+<h3>Load libraries</h3>
 <p>We need the following packages for later implementation:</p>
 <pre class="r"><code>library(&quot;knockoff&quot;)
 library(&quot;gam&quot;)
@@ -408,8 +407,8 @@ y = y.sample(X)</code></pre>
 <pre class="r"><code>Xk = create.gaussian(X,mu,Sigma)#generate knockoff Xk
 W = stat.glmnet_coefdiff(X,Xk,y)#calculate feature importance statistics (LCD)</code></pre>
 </div>
-<div id="adaptive-knockoffs" class="section level3">
-<h3>Adaptive knockoffs</h3>
+<div id="run-adaptive-knockoffs" class="section level3">
+<h3>Run adaptive knockoffs</h3>
 <p>Call adaptive knockoff function:</p>
 <pre class="r"><code>res = adaptiveKnockoff::adaptive_knockoff(W,U,fdr = alphalist)</code></pre>
 <p>Calculate the resulting power and FDP:</p>
@@ -437,8 +436,7 @@ for (i in 1:length(alphalist)){
 <h3>Visualizing results</h3>
 <p>Plot power and FDP versus the target FDR level: <img src="tutorial1_files/figure-html/fig2-1.png" width="768" style="display: block; margin: auto;" /></p>
 <p>We can also plot the realized ordering determined by adaptive knockoff. The plot below contains the last two hundred features in the ordering.</p>
-<pre class="r"><code>pp = adaptiveKnockoff::plot_ordering(res,nonzero,start_index = 701)
-print(pp)</code></pre>
+<pre class="r"><code>adaptiveKnockoff::plot_ordering(res,nonzero,start_index = 701)</code></pre>
 <p><img src="tutorial1_files/figure-html/fig3-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 
