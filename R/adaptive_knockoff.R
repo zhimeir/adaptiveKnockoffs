@@ -26,7 +26,7 @@ adaptive_knockoff <- function(W,U,fdr = 0.1,offset= 1, method = filter_randomFor
   }else{
     stop("X should be a numeric matrix!")
     }
-
+  # There is no y in the input
   if(is.numeric(y) == 1){
     if(length(y) != n) stop('The size of X is not consistent with y!')
   }else{
