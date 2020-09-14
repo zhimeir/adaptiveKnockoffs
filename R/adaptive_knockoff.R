@@ -23,6 +23,7 @@ adaptive_knockoff <- function(W,U,fdr = 0.1,offset= 1, method = filter_randomFor
   
   if(is.numeric(W)){
     W = as.vector(W)
+    p <- length(W)
   }else{
     stop('W is not a numeric vector')
   }
