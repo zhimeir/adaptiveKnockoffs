@@ -20,19 +20,13 @@ adaptive_knockoff <- function(W,U,fdr = 0.1,offset= 1, method = filter_randomFor
   lapply(packages, require, character.only = TRUE)
 
   #Check input format
-  if(is.numeric(X) == 1){
-    n = dim(X)[1]
-    p = dim(X)[2]
+  
+  if(is.numeric(W)){
+    W = as.vector(W)
   }else{
-    stop("X should be a numeric matrix!")
-    }
-
-  if(is.numeric(y) == 1){
-    if(length(y) != n) stop('The size of X is not consistent with y!')
-  }else{
-    stop('y should be a numeric vector!')
-
+    stop('W is not a numeric vector')
   }
+
   if(is.numeric(U) == 0){
       stop("U should be a numeric matrix!")
   }else{
