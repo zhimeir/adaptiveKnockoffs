@@ -45,16 +45,18 @@
 
 
 
-filter_EM <- function(W,U,alpha = 0.1,offset = 1,mute = TRUE,df = 3,R=1,s0 = 5e-3,cutoff = NULL){
+filter_EM <- function(W, U, alpha = 0.1, offset = 1,
+                      mute = TRUE, df = 3, R=1, s0 = 5e-3,
+                      cutoff = NULL){
   #Check the input format
   if(is.numeric(W)){
-    W = as.vector(W)
+    W <- as.vector(W)
   }else{
     stop('W is not a numeric vector')
   }
 
   if(is.numeric(U) ==1){
-    U = as.matrix(U)
+    U <- as.matrix(U)
   }else{
     stop('U is not numeric')
   }
@@ -65,60 +67,85 @@ filter_EM <- function(W,U,alpha = 0.1,offset = 1,mute = TRUE,df = 3,R=1,s0 = 5e-
 
 
   #Extract dimensionality
-  p = length(W)
+  p <- length(W)
   #check if z is in the correct form
   if(dim(U)[1]!=p){
     if(dim(U)[2]==p){
-      U = t(U)
+      U <- t(U)
     }
     else{
       stop('Please check the dimensionality of the side information!')
     }
   }
-  pz = dim(U)[2]
-  all_id = 1:p
-  tau.sel = c()
+  pz <- dim(U)[2]
+  all_id <- 1:p
+  tau.sel <- c()
 
 
   # Initializing the output
-  rejs = vector("list",length(alpha))
-  nrejs =  rep(0,length(alpha))
-  ordered_alpha = sort(alpha,decreasing = TRUE)
-  rej.path = c()
-  index.rank = rep(0,p)
+  rejs <- vector("list",length(alpha))
+  nrejs <- rep(0,length(alpha))
+  ordered_alpha <- sort(alpha,decreasing = TRUE)
+  rej.path <- c()
+  index.rank <- rep(0,p)
 
   # Algorithm initialization
-  W_abs = abs(W)
-  W_revealed = W_abs
+  W_abs <- abs(W)
+  W_revealed <- W_abs
 
 
   # Revealing a small amount of signs based on magnitude only
-  tau = rep(s0,p)
+  tau <- rep(s0,p)
 
-  revealed_id = which(W_abs<=tau)
+  revealed_id <- which(W_abs<=tau)
 
 
-  if (length(revealed_id)>0)
-  {unrevealed_id =all_id[-revealed_id]
-  W_revealed[revealed_id] = W[revealed_id]
-  rej.path = c(rej.path,revealed_id)
-  index.rank[revealed_id] = 1
+  if (length(revealed_id)>0){
+    unrevealed_id =all_id[-revealed_id]
+    W_revealed[revealed_id] = W[revealed_id]
+    rej.path = c(rej.path,revealed_id)
+    index.rank[revealed_id] = 1
   }else{
     unrevealed_id = all_id
   }
 
-  pi = rep(sum(W>0)/p,p)
-  delta0 = sum(W==0)/p*(1-mean(pi))
-  delta1 = sum(W==0)/p*(mean(pi))
+  ## Initialization
+  pi = rep(mean(W_revealed > 0),p)
+  delta0 = mean(W == 0) * (1-mean(pi))
+  delta1 = mean(W == 0) * (mean(pi))
   t = logis(W_revealed)
-  mu_0 =  rep(-log(logis(mean(W_abs[W<0]))),p)
-  mu_1 = rep(-log(logis(mean(W_abs[W>0]))),p)
+
+  W_impute_0 <- W_revealed
+  W_impute_0[-revealed_id] <- W_impute_0[-revealed_id] * sign(rnorm(p-length(revealed_id)))
+  W_impute_1 <- abs(W_revealed)
+  y0 = -log(logis(W_impute_0))
+  y1 = -log(logis(W_impute_1))
+
+  mu_0 <- rep(0,p)
+  mu_1 <- rep(0,p)
+  
+  if(dim(U)[2]==1){
+    mdl <- gam(y0[t!=1/2]~ns(U[t!=1/2],df), family = Gamma(link = "log"))
+  }else{
+    mdl <- gam(y0[t!=1/2]~s(U[t!=1/2,1],U[t!=1/2,2]), family = Gamma(link = "log"))
+  }
+          
+  mu_0[t!=1/2] <- mdl$fitted.values
+
+  if(dim(U)[2]==1){
+    mdl <- gam(y1[t!=1/2]~ns(U[t!=1/2],df), family = Gamma(link = "log"))
+  }else{
+    mdl <- gam(y1[t!=1/2]~s(U[t!=1/2,1],U[t!=1/2,2]), family = Gamma(link = "log"))
+  }
+          
+  mu_1[t!=1/2] <- mdl$fitted.values
+
+  ##   mu_0 =  rep(-log(logis(mean(W_abs[W<0]))),p)
+  ##   mu_1 = rep(-log(logis(mean(W_abs[W>0]))),p)
   mu_1[W==0] = log(2)
   mu_0[W==0] = log(2)
 
-  H = rep(1e-10,p)
-  y0 = -log(t)
-  y1 = -log(t)
+  H = rep(.5,p)
   count = 0
 
   for (talpha in 1:length(alpha)){
@@ -129,16 +156,24 @@ filter_EM <- function(W,U,alpha = 0.1,offset = 1,mute = TRUE,df = 3,R=1,s0 = 5e-
       for (r in 1:R){
         # E step
         # revealed part
-        H[revealed_id] = sapply(1:length(revealed_id),function(j) prob_revealed(pi[revealed_id[j]],mu_0[revealed_id[j]],mu_1[revealed_id[j]],t[revealed_id[j]],delta0,delta1))
+        H[revealed_id] = sapply(1:length(revealed_id),function(j) 
+                                prob_revealed(pi[revealed_id[j]],mu_0[revealed_id[j]],mu_1[revealed_id[j]],
+                                              t[revealed_id[j]],delta0,delta1))
         y1[revealed_id] = -log(t[revealed_id])
         y0[revealed_id] = -log(t[revealed_id])
 
         # unrevealed part
-        H[unrevealed_id] = sapply(1:length(unrevealed_id),function(j) prob_unrevealed(pi[unrevealed_id[j]],mu_0[unrevealed_id[j]],mu_1[unrevealed_id[j]],t[unrevealed_id[j]],delta0,delta1))
+        H[unrevealed_id] = sapply(1:length(unrevealed_id),function(j) 
+                                  prob_unrevealed(pi[unrevealed_id[j]],mu_0[unrevealed_id[j]],mu_1[unrevealed_id[j]],
+                                                  t[unrevealed_id[j]],delta0,delta1))
         H = pmax(H,1e-10)
         H = pmin(H,1-1e-10)
-        y1[unrevealed_id] = sapply(1:length(unrevealed_id),function(j) exp_unrevealed_1(pi[unrevealed_id[j]],mu_0[unrevealed_id[j]],mu_1[unrevealed_id[j]],t[unrevealed_id[j]],delta0,delta1))/H[unrevealed_id]
-        y0[unrevealed_id] = sapply(1:length(unrevealed_id),function(j) exp_unrevealed_0(pi[unrevealed_id[j]],mu_0[unrevealed_id[j]],mu_1[unrevealed_id[j]],t[unrevealed_id[j]],delta0,delta1))/(1-H[unrevealed_id])
+        y1[unrevealed_id] = sapply(1:length(unrevealed_id),function(j) 
+                                   exp_unrevealed_1(pi[unrevealed_id[j]],mu_0[unrevealed_id[j]],mu_1[unrevealed_id[j]],
+                                                    t[unrevealed_id[j]],delta0,delta1))/H[unrevealed_id]
+        y0[unrevealed_id] = sapply(1:length(unrevealed_id),function(j) 
+                                   exp_unrevealed_0(pi[unrevealed_id[j]],mu_0[unrevealed_id[j]],mu_1[unrevealed_id[j]],
+                                                    t[unrevealed_id[j]],delta0,delta1))/(1-H[unrevealed_id])
 
 
         # M step
@@ -151,19 +186,26 @@ filter_EM <- function(W,U,alpha = 0.1,offset = 1,mute = TRUE,df = 3,R=1,s0 = 5e-
             mdl = gam(log(H/(1-H))~s(U[,1],U[,2]))
             pi = logis(mdl$fitted.values)
           }
-          if(dim(U)[2]==1){mdl =gam(y0[t!=1/2]~ns(U[t!=1/2],df),weights = (1-H[t!=1/2]),family = Gamma(link = "log"))
+          
+          if(dim(U)[2]==1){
+            ##             mdl <- gam(y0[t!=1/2]~ns(U[t!=1/2],df),weights = (1-H[t!=1/2]),family = Gamma(link = "log"))
+            mdl <- gam(y0[t!=1/2]~ns(U[t!=1/2],df),family = Gamma(link = "log"))
           }else{
-            mdl =gam(y0[t!=1/2]~s(U[t!=1/2,1],U[t!=1/2,2]),weights = (1-H[t!=1/2]),family = Gamma(link = "log"))
+            mdl <- gam(y0[t!=1/2]~s(U[t!=1/2,1],U[t!=1/2,2]),weights = (1-H[t!=1/2]),family = Gamma(link = "log"))
           }
-          mu_0[t!=1/2] =mdl$fitted.values
+          
+          mu_0[t!=1/2] <- mdl$fitted.values
 
-          if(dim(U)[2]==1){mdl =gam(y1[t!=1/2]~ns(U[t!=1/2],df),weights = (H[t!=1/2]),family = Gamma(link = "log"))
+          if(dim(U)[2]==1){
+            ##             mdl <- gam(y1[t!=1/2]~ns(U[t!=1/2],df),weights = (H[t!=1/2]),family = Gamma(link = "log"))
+            mdl <- gam(y1[t!=1/2]~ns(U[t!=1/2],df),family = Gamma(link = "log"))
           }else{
-            mdl =gam(y1[t!=1/2]~s(U[t!=1/2,1],U[t!=1/2,2]),weights = (H[t!=1/2]),family = Gamma(link = "log"))
+            mdl <- gam(y1[t!=1/2]~s(U[t!=1/2,1],U[t!=1/2,2]),weights = (H[t!=1/2]),family = Gamma(link = "log"))
           }
-          mu_1[t!=1/2] =mdl$fitted.values
+          
+          mu_1[t!=1/2] <- mdl$fitted.values
         }else{
-          mdl = randomForest(y= H,x=as.matrix(U))
+          mdl = randomForest(y= H, x=as.matrix(U))
           pi = mdl$predicted
           mdl = randomForest(y = y0[t!=1/2],x= as.matrix(U[t!=1/2,]))
           mu_0[t!=1/2] =mdl$predicted
@@ -171,12 +213,14 @@ filter_EM <- function(W,U,alpha = 0.1,offset = 1,mute = TRUE,df = 3,R=1,s0 = 5e-
           mu_1[t!=1/2] =mdl$predicted
         }
 
-        delta0 = sum((1-H)*(t==1/2))/(sum((1-H)*(t==1/2))+sum((1-H)*(t!=1/2)))
-        delta1 = sum((H)*(t==1/2))/(sum((H)*(t==1/2))+sum((H)*(t!=1/2)))
+        delta0 = sum((1-H) * (t==1/2)) / (sum((1-H) * (t==1/2)) + sum((1-H) * (t!=1/2)))
+        delta1 = sum((H) * (t==1/2)) / (sum((H) * (t==1/2)) + sum((H) * (t!=1/2)))
       }
 
 
-      horder = sapply(1:length(unrevealed_id),function(j) order_prob(pi[unrevealed_id[j]],mu_0[unrevealed_id[j]],mu_1[unrevealed_id[j]],t[unrevealed_id[j]],delta0,delta1))
+      horder = sapply(1:length(unrevealed_id),function(j) 
+                      order_prob(pi[unrevealed_id[j]],mu_0[unrevealed_id[j]],mu_1[unrevealed_id[j]],
+                                 t[unrevealed_id[j]],delta0,delta1))
       #ploth = rep(0,p)
       #ploth[unrevealed_id] = sign(W[unrevealed_id])*horder
       #plot(ploth)
