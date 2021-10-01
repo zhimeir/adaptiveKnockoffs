@@ -38,7 +38,8 @@ result = filter_randomForest(W,U)
 plot_ordering(result,nonzero = nonzero)
 }
 \seealso{
-Other plot: \code{\link{plot_rank}},
-  \code{\link{plot_vanilla}}
+Other plot: 
+\code{\link{plot_rank}()},
+\code{\link{plot_vanilla}()}
 }
 \concept{plot}

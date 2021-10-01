@@ -2,6 +2,7 @@
 
 export(adaptive_knockoff)
 export(filter_EM)
+export(filter_bin_EM)
 export(filter_gam)
 export(filter_glm)
 export(filter_glmnet)

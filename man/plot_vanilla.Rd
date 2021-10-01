@@ -20,7 +20,8 @@ A plot of the realized ordering by vanilla knockoff.
 Plot_vanilla plots the ordering of vanilla knockoff as reference.
 }
 \seealso{
-Other plot: \code{\link{plot_ordering}},
-  \code{\link{plot_rank}}
+Other plot: 
+\code{\link{plot_ordering}()},
+\code{\link{plot_rank}()}
 }
 \concept{plot}

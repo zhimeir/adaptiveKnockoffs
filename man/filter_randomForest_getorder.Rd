@@ -4,8 +4,14 @@
 \alias{filter_randomForest_getorder}
 \title{Adaptive Knockoff Filter With Random Forest}
 \usage{
-filter_randomForest_getorder(W, z, alpha = 0.1, offset = 1,
-  reveal_prop = 0.5, mute = TRUE)
+filter_randomForest_getorder(
+  W,
+  z,
+  alpha = 0.1,
+  offset = 1,
+  reveal_prop = 0.5,
+  mute = TRUE
+)
 }
 \arguments{
 \item{W}{vector of length p, denoting the imporatence statistics calculated by \code{\link[knockoff]{knockoff.filter}}.}
@@ -53,9 +59,11 @@ result = filter_glm(W,z)
 
 }
 \seealso{
-Other filter: \code{\link{filter_EM}},
-  \code{\link{filter_gam}}, \code{\link{filter_glmnet}},
-  \code{\link{filter_glm}},
-  \code{\link{filter_randomForest}}
+Other filter: 
+\code{\link{filter_EM}()},
+\code{\link{filter_gam}()},
+\code{\link{filter_glmnet}()},
+\code{\link{filter_glm}()},
+\code{\link{filter_randomForest}()}
 }
 \concept{filter}

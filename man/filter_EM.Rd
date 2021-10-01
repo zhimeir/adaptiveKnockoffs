@@ -4,8 +4,17 @@
 \alias{filter_EM}
 \title{Adaptive knockoff filter based on Bayeian two group model}
 \usage{
-filter_EM(W, U, alpha = 0.1, offset = 1, mute = TRUE, df = 3,
-  R = 1, s0 = 0.005, cutoff = NULL)
+filter_EM(
+  W,
+  U,
+  alpha = 0.1,
+  offset = 1,
+  mute = TRUE,
+  df = 3,
+  R = 1,
+  s0 = 0.005,
+  cutoff = NULL
+)
 }
 \arguments{
 \item{W}{vector of length p, denoting the imporatence statistics calculated by \code{\link[knockoff]{knockoff.filter}}.}
@@ -55,9 +64,11 @@ result = filter_EM(W,U)
 
 }
 \seealso{
-Other filter: \code{\link{filter_gam}},
-  \code{\link{filter_glmnet}}, \code{\link{filter_glm}},
-  \code{\link{filter_randomForest_getorder}},
-  \code{\link{filter_randomForest}}
+Other filter: 
+\code{\link{filter_gam}()},
+\code{\link{filter_glmnet}()},
+\code{\link{filter_glm}()},
+\code{\link{filter_randomForest_getorder}()},
+\code{\link{filter_randomForest}()}
 }
 \concept{filter}

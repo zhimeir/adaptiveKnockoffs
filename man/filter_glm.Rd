@@ -4,8 +4,7 @@
 \alias{filter_glm}
 \title{Adaptive knockoff filter With GLM (Generalized Linear Model)}
 \usage{
-filter_glm(W, z, alpha = 0.1, offset = 1, reveal_prop = 0.5,
-  mute = TRUE)
+filter_glm(W, z, alpha = 0.1, offset = 1, reveal_prop = 0.5, mute = TRUE)
 }
 \arguments{
 \item{W}{vector of length p, denoting the imporatence statistics calculated by \code{\link[knockoff]{knockoff.filter}}.}
@@ -54,9 +53,11 @@ result = filter_glm(W,z)
 
 }
 \seealso{
-Other filter: \code{\link{filter_EM}},
-  \code{\link{filter_gam}}, \code{\link{filter_glmnet}},
-  \code{\link{filter_randomForest_getorder}},
-  \code{\link{filter_randomForest}}
+Other filter: 
+\code{\link{filter_EM}()},
+\code{\link{filter_gam}()},
+\code{\link{filter_glmnet}()},
+\code{\link{filter_randomForest_getorder}()},
+\code{\link{filter_randomForest}()}
 }
 \concept{filter}

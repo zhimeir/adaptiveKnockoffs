@@ -4,8 +4,15 @@
 \alias{filter_gam}
 \title{Adaptive knockoff filter based on GAM (Generalized Additive Model)}
 \usage{
-filter_gam(W, z, df = 5, alpha = 0.1, offset = 1,
-  reveal_prop = 0.5, mute = TRUE)
+filter_gam(
+  W,
+  z,
+  df = 5,
+  alpha = 0.1,
+  offset = 1,
+  reveal_prop = 0.5,
+  mute = TRUE
+)
 }
 \arguments{
 \item{W}{vector of length p, denoting the imporatence statistics calculated by \code{\link[knockoff]{knockoff.filter}}.}
@@ -53,9 +60,11 @@ result = filter_gam(W,z)
 
 }
 \seealso{
-Other filter: \code{\link{filter_EM}},
-  \code{\link{filter_glmnet}}, \code{\link{filter_glm}},
-  \code{\link{filter_randomForest_getorder}},
-  \code{\link{filter_randomForest}}
+Other filter: 
+\code{\link{filter_EM}()},
+\code{\link{filter_glmnet}()},
+\code{\link{filter_glm}()},
+\code{\link{filter_randomForest_getorder}()},
+\code{\link{filter_randomForest}()}
 }
 \concept{filter}
