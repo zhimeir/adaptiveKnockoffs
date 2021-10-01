@@ -1,3 +1,4 @@
+#' @export
 filter_bin_EM <- function(W, U, alpha = 0.1, offset = 1, df = 3, df_list = 1:10,
                       mute = TRUE, reveal_prop = 0.1, R=1, 
                       cutoff = NULL, tol = 1e-4){
