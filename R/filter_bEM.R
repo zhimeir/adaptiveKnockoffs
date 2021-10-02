@@ -113,7 +113,7 @@ filter_bin_EM <- function(W, U, alpha = 0.1, offset = 1, df = 3, df_list = 1:10,
           eta_df <- res$opt_eta_df
 
           if(dim(U)[2] ==1){
-            mdl <- gam(H  ~ ns(U, nu_df) + abs(W), family = quasibinomial())
+            mdl <- gam(H  ~ ns(U, nu_df), family = quasibinomial())
             if(max(abs(mdl$fitted.value - nu)) > tol){
               nu <- mdl$fitted.values
             }
@@ -235,7 +235,7 @@ select_mdl <- function(df_list, U, W, H, S){
   eta_val <- c()
 
   for(df in df_list){
-    nu_mdl <- gam(H  ~ ns(U, df) + abs(W), family = binomial())
+    nu_mdl <- gam(H  ~ ns(U, df), family = binomial())
     eta_mdl <- gam(S ~ ns(U, df) + abs(W), family = binomial()) 
     nu_val <- c(nu_val, BIC(nu_mdl))
     eta_val <- c(eta_val, BIC(eta_mdl))

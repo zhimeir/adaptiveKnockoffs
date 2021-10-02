@@ -9,8 +9,8 @@ adaptive_knockoff(
   U,
   fdr = 0.1,
   offset = 1,
-  method = filter_randomForest,
-  reveal_prop = 0.5,
+  method = filter_gam,
+  reveal_prop = 0.1,
   mute = TRUE
 )
 }

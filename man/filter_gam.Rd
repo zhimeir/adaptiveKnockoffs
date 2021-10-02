@@ -6,26 +6,26 @@
 \usage{
 filter_gam(
   W,
-  z,
-  df = 5,
+  U,
   alpha = 0.1,
   offset = 1,
-  reveal_prop = 0.5,
+  df_list = 6:10,
+  reveal_prop = 0.1,
   mute = TRUE
 )
 }
 \arguments{
 \item{W}{vector of length p, denoting the imporatence statistics calculated by \code{\link[knockoff]{knockoff.filter}}.}
 
-\item{z}{p-by-r matrix of side information.}
-
-\item{df}{Degree of freedom of the splines (default is 5).}
-
 \item{alpha}{target FDR level (default is 0.1).}
 
 \item{reveal_prop}{The proportion of hypotheses revealed at intialization (default is 0.5).}
 
 \item{mute}{whether \eqn{\hat{fdp}} of each iteration is printed (defalt is TRUE).}
+
+\item{z}{p-by-r matrix of side information.}
+
+\item{df}{Degree of freedom of the splines (default is 5).}
 }
 \value{
 A list of the following:

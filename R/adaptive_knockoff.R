@@ -13,8 +13,8 @@
 
 
 adaptive_knockoff <- function(W, U, fdr = 0.1, offset= 1, 
-                              method = filter_randomForest,
-                              reveal_prop = 0.5, mute = TRUE){
+                              method = filter_gam,
+                              reveal_prop = 0.1, mute = TRUE){
 
   #Loading necessary packages
   packages <- c("gam","glmnet","randomForest","doMC")
@@ -34,8 +34,8 @@ adaptive_knockoff <- function(W, U, fdr = 0.1, offset= 1,
     U <- as.matrix(U)
   }
 
-  if(dim(U)[1]!=p){
-    if(dim(U)[2]==P){
+  if(dim(U)[1] != p){
+    if(dim(U)[2] == p){
       U = t(U)
     }else{
       stop("Please check the dimesion of U.")
