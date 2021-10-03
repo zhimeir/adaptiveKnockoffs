@@ -17,15 +17,15 @@ filter_gam(
 \arguments{
 \item{W}{vector of length p, denoting the imporatence statistics calculated by \code{\link[knockoff]{knockoff.filter}}.}
 
-\item{alpha}{target FDR level (default is 0.1).}
+\item{U}{p-by-r matrix of side information.}
 
-\item{reveal_prop}{The proportion of hypotheses revealed at intialization (default is 0.5).}
+\item{alpha}{(a vector of) target FDR levels (default is 0.1).}
+
+\item{df_list}{A list of candidates for the degree of freedom of the splines (default is 6:10).}
+
+\item{reveal_prop}{The proportion of hypotheses revealed according to |W| (default is 0.1).}
 
 \item{mute}{whether \eqn{\hat{fdp}} of each iteration is printed (defalt is TRUE).}
-
-\item{z}{p-by-r matrix of side information.}
-
-\item{df}{Degree of freedom of the splines (default is 5).}
 }
 \value{
 A list of the following:
@@ -33,11 +33,12 @@ A list of the following:
  \item{rejs}{Rejsction set fot each specified target fdr (alpha) level}
  \item{rej.path}{The order of the hypotheses (used for diagnostics)}
  \item{unrevealed.id}{id of the hypotheses that are nor revealed in the end (used for diagnostics)}
- \item{tau}{Threshold of each target FDR level (used for diagnostics)}
- \item{acc}{The accuracy of classfication at each step (used for diagnostics)}
 }
 \description{
-filter_gam takes the inmportance statistic W as input. The filter determines the order of the statistic by the probability of being a null. The probability is given by GAM.
+filter_gam takes the inmportance statistic W as input. 
+The filter determines the order of the statistic by 
+the probability of being a null. The probability is 
+given by GAM.
 }
 \examples{
 #Generating data
