@@ -123,13 +123,13 @@ filter_bin_EM <- function(W, U, alpha = 0.1, offset = 1, df = 3, df_list = 1:10,
           }
           
           if(dim(U)[2]==1){
-            ##             mdl <- gam(S[W != 0] ~ ns(U[W != 0], eta_df) + W_abs[W != 0], family = binomial())
+            ##             mdl <- gam(S[W != 0] ~ ns(U[W != 0], eta_df) + W_abs[W != 0], family = quasibinomial())
             mdl <- gam(S ~ ns(U, eta_df) + W_abs, family = quasibinomial())
           }else{
             mdl <- gam(y0[t!=1/2]~s(U[t!=1/2,1],U[t!=1/2,2]),weights = (1-H[t!=1/2]),family = Gamma(link = "log"))
           }
-          if(max(abs(mdl$fitted - eta[W!=0])) > tol){
-            eta[W != 0] <- mdl$fitted.values[W!=0]
+          if(max(abs(mdl$fitted.values[W != 0] - eta[W != 0])) > tol){
+            eta[W != 0] <- mdl$fitted.values[W != 0]
           }
         }
       }
@@ -210,7 +210,7 @@ H_rev <- function(nu_id, eta_id, s_id){
 S_unrev <- function(nu_id, eta_id, w_id){
 
   if(w_id != 0){
-    sexp <- nu_id * eta_id + (1 - nu_id) / 2
+    sexp <- eta_id 
   }else{
     sexp <- 1 / 2
   }
